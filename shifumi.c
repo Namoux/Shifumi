@@ -67,19 +67,29 @@ int main () {
     printf("---------------------- ShiFuMi ! --------------------\n");
 
     char j1[BUF_SIZE];
-    char j2[BUF_SIZE];
     char forme1[BUF_SIZE];
     char forme2[BUF_SIZE];
     int choix1 = 0;
-    int choix2 = 0;
+    int choixPC = 0;
     int victoire1 = 0;
     int victoire2 = 0;
 
     printf("Joueur 1, quel est ton prenom?\n");
     joueur(j1);
 
-    printf("Joueur 2, quel est ton prenom?\n");
-    joueur(j2);
+        // Si joueur connu, lire son fichier de sauvegarde et afficher les scores
+        FILE * fd; 
+        fd = fopen(j1, "r");
+        if (fd != NULL) {
+            char line[BUF_SIZE]; memset( line, 0, BUF_SIZE);
+            fgets(line,BUF_SIZE,fd);
+            sscanf(line, "%d %d", &victoire1, &victoire2);
+            printf("\n");
+            printf("Précédent score :\n");
+            printf("%s : %d\n", j1, victoire1);
+            printf("PC : %d\n", victoire2);
+            fclose(fd);
+        }
 
     while(1){
         printf("\n");
@@ -87,35 +97,23 @@ int main () {
         choix1 = p_choix();
             // Quitte le jeu si 0
             if (choix1 == 0) {
-            printf("\n");
-            printf("Victoires : \n");
-            printf("%s : %d\n", j1, victoire1);
-            printf("%s : %d\n", j2, victoire2);
+                printf("\n");
+                printf("Victoires : \n");
+                printf("%s : %d\n", j1, victoire1);
+                printf("PC : %d\n", victoire2);
                 printf("---------------------- GAME OVER ! --------------------\n");
             break;  // Sort de la boucle si le joueur 1 choisit de quitter
             }
         handValueToString(choix1, forme1);
 
-        system("clear");
-
-        printf("\n");
-        printf("%s?\n", j2);
-        choix2 = p_choix();
-            if (choix2 == 0) {
-            printf("\n");
-            printf("Victoires : \n");
-            printf("%s : %d\n", j1, victoire1);
-            printf("%s : %d\n", j2, victoire2);
-                printf("---------------------- GAME OVER ! --------------------\n");
-            break;  // Sort de la boucle si le joueur 2 choisit de quitter
-            }
-        handValueToString(choix2, forme2);
-
-        system("clear");
-
+        // PC fait un choix aleatoire
+        srand(time(NULL));
+        choixPC = (rand()% 3) + 1;;
+        handValueToString(choixPC, forme2);
+        
         printf("\n");
         printf("%s fait %s\n", j1, forme1);
-        printf("%s fait %s\n", j2, forme2);
+        printf("PC fait %s\n", forme2);
         printf("\n");
 
         // 3 petits points pour le suspense
@@ -128,31 +126,47 @@ int main () {
         printf("\n");
 
         // Condition de victoire
-        if (choix1 == choix2) {
+        if (choix1 == choixPC) {
             printf("%s = %s\n", forme1, forme2);
             printf("Vous faites égalité!\n");
             printf("\n");
             printf("Victoires : \n");
             printf("%s : %d\n", j1, victoire1);
-            printf("%s : %d\n", j2, victoire2);
-        } else if ((choix1 == PIERRE && choix2 == CISEAUX) || (choix1 == FEUILLE && choix2 == PIERRE) || (choix1 == CISEAUX && choix2 == FEUILLE)) {
+            printf("PC : %d\n", victoire2);
+        } else if ((choix1 == PIERRE && choixPC == CISEAUX) || (choix1 == FEUILLE && choixPC == PIERRE) || (choix1 == CISEAUX && choixPC == FEUILLE)) {
             printf("%s > %s\n", forme1, forme2);
             printf("%s a gagné!\n", j1);
             victoire1++;
             printf("\n");
             printf("Victoires : \n");
             printf("%s : %d\n", j1, victoire1);
-            printf("%s : %d\n", j2, victoire2);
+            printf("PC : %d\n", victoire2);
         } else {
             printf("%s < %s\n", forme1, forme2);
-            printf("%s a gagné!\n", j2);
+            printf("PC a gagné!\n");
             victoire2++;
             printf("\n");
             printf("Victoires : \n");
             printf("%s : %d\n", j1, victoire1);
-            printf("%s : %d\n", j2, victoire2);
+            printf("PC : %d\n", victoire2);
 
         }
+
+        // Sauvegarde du score
+        FILE * fd; 
+        fd = fopen(j1, "r+");
+            // Si le fichier n'existe pas, on le cree avec w
+            if (fd == NULL) {
+                fd = fopen(j1, "w");
+                fclose(fd);
+            }
+
+        fd = fopen(j1, "r+");
+            // Si il existe, on inscrit les scores
+            if (fd != NULL) {
+                fprintf(fd, "%d %d", victoire1, victoire2);
+                fclose(fd);
+            }
     }
     return 0;
 }
