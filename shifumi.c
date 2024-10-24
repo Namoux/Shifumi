@@ -48,6 +48,7 @@ int p_choix() {
     return -1;  // Erreur si la saisie n'est pas reconnue
 }
 
+ // Fonction qui copie le int en string
 void handValueToString(int hand,char* tab){
     memset(tab,0,255);
     if(hand == 1){
@@ -84,6 +85,7 @@ int main () {
         printf("\n");
         printf("%s?\n", j1);
         choix1 = p_choix();
+            // Quitte le jeu si 0
             if (choix1 == 0) {
             printf("\n");
             printf("Victoires : \n");
@@ -125,6 +127,7 @@ int main () {
         }
         printf("\n");
 
+        // Condition de victoire
         if (choix1 == choix2) {
             printf("%s = %s\n", forme1, forme2);
             printf("Vous faites égalité!\n");
